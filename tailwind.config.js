@@ -7,12 +7,18 @@ module.exports = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
     "*.{js,ts,jsx,tsx,mdx}",
+    // "**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     container: {
       center: true,
       padding: "2rem",
       screens: {
+        "ss": "420px",
+        "sm": "640px",
+        "md": "768px",
+        "lg": "1020px",
+        "xl": "1200px",
         "2xl": "1400px",
       },
     },
@@ -71,6 +77,10 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        mono: ["Mona Sans", "monospace"],
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
