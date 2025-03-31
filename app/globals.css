@@ -60,3 +60,13 @@
   }
 }
 
+
+@layer components {
+  .btn-primary {
+    @apply px-8 py-6 justify-center flex gap-2 bg-green-700 text-white w-full rounded-[60px] text-base leading-normal font-semibold font-mono !important;
+  }
+
+  .btn-light {
+    @apply  px-8 py-6 justify-center flex gap-2 bg-white text-black border border-gray-500 w-full rounded-[60px] text-base leading-normal font-semibold font-mono !important;
+  }
+}
