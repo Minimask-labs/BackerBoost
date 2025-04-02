@@ -2,10 +2,9 @@
 
 import {
   FormControl,
-  FormDescription,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { FormFieldTypes } from "@/enums";
@@ -14,9 +13,8 @@ import {
   Control,
   Controller,
   ControllerRenderProps,
-  FieldValue,
   FieldValues,
-  Path,
+  Path
 } from "react-hook-form";
 
 interface FormFieldProps<T extends FieldValues> {
@@ -45,7 +43,7 @@ const RenderField = <T extends FieldValues>({
       return (
         <Input
           {...field}
-          className=""
+          className="input"
           type={props.type}
           required={props.required}
           placeholder={props.placeholder}

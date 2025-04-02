@@ -63,9 +63,9 @@ const SignUpForm = () => {
 
         <Button className="btn-light">Create Account With Google</Button>
 
-        <Button className="btn-light">
+        {/* <Button className="btn-light">
           Create Account With Cardano Wallet
-        </Button>
+        </Button> */}
       </form>
     </Form>
   );

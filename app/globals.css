@@ -69,4 +69,8 @@
   .btn-light {
     @apply  px-8 py-6 justify-center flex gap-2 bg-white text-black border border-gray-500 w-full rounded-[60px] text-base leading-normal font-semibold font-mono !important;
   }
+
+  .input {
+    @apply !px-[14px] !py-[12px] rounded-lg font-sans font-medium !important;
+  }
 }
