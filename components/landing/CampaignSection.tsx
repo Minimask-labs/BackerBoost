@@ -1,6 +1,7 @@
 import { featuredCampaigns } from "@/constants";
 import { Progress } from "@/components/ui/progress";
-import { Link, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
 import {
