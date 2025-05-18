@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className={`${monaSans.variable} ${inter.variable} antialiased`}>
         <PuzzleWalletProvider>{children}</PuzzleWalletProvider>
         <Toaster />
-      </body>
+       </body>
     </html>
   );
 }

@@ -17,6 +17,10 @@
     "@puzzlehq/sdk": "^1.0.3",
     "@puzzlehq/sdk-core": "^1.0.3",
     "@puzzlehq/types": "^1.0.31",
+    "@cardano-foundation/cardano-connect-with-wallet": "^0.2.14",
+    "@cardano-foundation/cardano-connect-with-wallet-core": "^0.2.8",
+    "@harmoniclabs/crypto": "0.3.0-dev0",
+     "@lucid-evolution/lucid": "^0.4.27",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.1.1",
@@ -45,6 +49,7 @@
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
     "aleo-adapters": "^1.2.1",
+    "@types/js-cookie": "^3.0.6",
     "autoprefixer": "^10.4.20",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
@@ -52,7 +57,7 @@
     "cmdk": "1.0.4",
     "crypto-js": "^4.2.0",
     "date-fns": "4.1.0",
-    "embla-carousel-react": "8.5.1",
+      "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.454.0",
@@ -74,11 +79,22 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "js-cookie": "^3.0.5",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "^18.0.0",
+      "react-dom": "^18.0.0"
+    },
+    "onlyBuiltDependencies": [
+      "cbor-extract"
+    ]
   }
 }
