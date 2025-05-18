@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Mona_Sans, Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Backerboost - A Web3 Crowdfunding and Project Management Platform",
@@ -30,8 +29,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${monaSans.variable} ${inter.variable} antialiased`}>
         {children}
-
-        <Toaster />
       </body>
     </html>
   );

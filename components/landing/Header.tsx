@@ -31,7 +31,7 @@ const Header = () => {
           </Link>
         </nav>
         <div className="flex items-center gap-4">
-          <Link href="/campaigns/create">
+          <Link href="/sign-in">
             <Button>Start a Campaign</Button>
           </Link>
         </div>

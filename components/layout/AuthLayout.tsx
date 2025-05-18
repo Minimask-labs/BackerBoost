@@ -15,7 +15,7 @@ const AuthLayout = ({ children }: LayoutProps) => {
             height={30}
             className="mt-0.5"
           />
-          <h1 className="font-mono sm:text-[30px] text-2xl font-bold text-green-600">
+          <h1 className="sm:text-[30px] text-2xl font-bold text-green-600">
             Backerboost
           </h1>
         </Link>
