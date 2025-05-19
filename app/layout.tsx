@@ -4,6 +4,8 @@ import { Mona_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { PuzzleWalletProvider } from '@puzzlehq/sdk';
+import { MeshProvider } from '@meshsdk/react';
+import '@meshsdk/react/styles.css';
 
 // export const metadata: Metadata = {
 //   title: "Backerboost - A Web3 Crowdfunding and Project Management Platform",
@@ -31,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${monaSans.variable} ${inter.variable} antialiased`}>
-        <PuzzleWalletProvider>{children}</PuzzleWalletProvider>
+      <MeshProvider>
+         <PuzzleWalletProvider>{children}</PuzzleWalletProvider>
+        </MeshProvider>
         <Toaster />
        </body>
     </html>
