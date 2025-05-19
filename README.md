@@ -3,6 +3,18 @@
 # CONTRACT DEPLOYMENT LINK
 https://testnet.aleoscan.io/program?id=crowdfund_beta.aleo
 
+# PREVIEW
+### BEFORE
+![Screenshot from 2025-05-19 03-43-32](https://github.com/user-attachments/assets/24937114-dd53-4b0a-b270-1cdfc2c27a6c)
+
+
+### AFTER
+![Screenshot from 2025-05-19 03-42-30](https://github.com/user-attachments/assets/4a0d18ad-90f6-4f96-ab61-ea1b16a1e8df)
+
+![Screenshot from 2025-05-19 03-44-29](https://github.com/user-attachments/assets/8e9e3b5f-c0f6-4a48-9395-7c99847edb6e)
+
+
+
 # CONTRACT OVERVIEW
 
 This contract implements a basic crowdfunding system where:
