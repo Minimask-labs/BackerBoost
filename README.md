@@ -1,7 +1,7 @@
 # BackerBoost
 
 # CONTRACT DEPLOYMENT LINK
-https://testnet.aleoscan.io/program?id=crowdfund_aleo.aleo
+https://testnet.aleoscan.io/program?id=crowdfund_beta.aleo
 
 # CONTRACT OVERVIEW
 
