@@ -1,13 +1,13 @@
-name = "backerboost/contract"
+name = "backerboost/crowdfund_cardano"
 version = "0.0.0"
 compiler = "v1.1.16"
 plutus = "v3"
 license = "Apache-2.0"
-description = "Aiken contracts for project 'backerboost/contract'"
+description = "Aiken crowdfund_cardanos for project 'backerboost/crowdfund_cardano'"
 
 [repository]
 user = "backerboost"
-project = "contract"
+project = "crowdfund_cardano"
 platform = "github"
 
 [[dependencies]]
