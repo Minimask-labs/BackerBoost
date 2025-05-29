@@ -1,135 +1,92 @@
-use aiken/hash.{Blake2b_224, Hash}
-use aiken/list
-use aiken/transaction.{
-  InlineDatum, Input, Output, OutputReference, ScriptContext, Spend, Transaction,
-}
-use aiken/transaction/credential.{Address, Script, Verification_key}
-use aiken/transaction/value.{Value}
+use aiken/collection/dict
+use aiken/collection/list
+use aiken/crypto.{VerificationKeyHash}
+use cardano/transaction.{OutputReference, Transaction}
 
-validator crowdfund {
-
-  ProjectId =
-  Hash<Blake2b_224, ProjectId>
-
-  Campaign {
-  boss: Address,
+// Campaign state stored in Datum as a list of tuples
+pub type Campaign {
+  boss: VerificationKeyHash,
   goal: Int,
   raised: Int,
   alive: Bool,
-  project_id: ProjectId,
+  vault: List<(VerificationKeyHash, Int)>,
 }
 
-  FunderInfo {
-  funder: Address,
-  amount: Int,
+// Redeemer actions
+pub type Action {
+  Start(Int)
+  Fund(Int, VerificationKeyHash)
+  Claim(Int)
+  Refund(Int, VerificationKeyHash, Int)
+  Kill(Int)
 }
 
-  Action {
-  Start { goal: Int }
-  Fund { amount: Int }
-  Claim { amount: Int }
-  Refund
-  Kill
+pub type Redeemer {
+  action: Action,
 }
 
-fn find_input_campaign(
-  transaction: Transaction,
-  output_reference: OutputReference,
-) -> Option<Campaign> {
-  transaction.inputs
-    |> list.find(fn(input) { input.output_reference == output_reference })
-    |> map(fn(input) { input.output.datum })
-    |> map(fn(datum) {
-      when datum is {
-        InlineDatum(d) -> Some(d)
-        _ -> None
-      }
-    })
-    |> flatten
-}
+validator campaign_validator {
+  spend(
+    datum: Option<Campaign>,
+    redeemer: Redeemer,
+    _own_ref: OutputReference,
+    tx: Transaction,
+  ) {
+    expect Some(Campaign { boss, goal, raised, alive, vault }) = datum
 
-fn must_be_signed_by(transaction: Transaction, address: Address) -> Bool {
-  transaction.extra_signatories |> list.has(address)
-}
+    // Convert List<(VerificationKeyHash, Int)> into Dict<ByteArray, Int>
+    let vault_dict =
+      dict.from_pairs(list.map(vault, fn((k, v)) { Pair(k, v) }))
 
-  fn evaluate(datum: Campaign, redeemer: Action, ctx: ScriptContext) -> Bool {
-    let ScriptContext { transaction, purpose } = ctx
-    
-    expect Spend(output_reference) = purpose
+    // Check if boss signed the transaction
+    let signer_present = list.any(tx.extra_signatories, fn(vk) { vk == boss })
 
-    when redeemer is {
-      Start { goal } -> {
-        // Validate campaign creation
-        and {
-          goal > 0,
-          datum.goal == goal,
-          datum.raised == 0,
-          datum.alive == True,
-        }
+    when redeemer.action is {
+      Start(_) ->
+        // Invalid on-chain; campaign must already exist
+        False
+
+      Fund(amount, contributor) -> {
+        let valid_amount = amount > 0
+
+        let previous =
+          when dict.get(vault_dict, contributor) is {
+            Some(value) -> value
+            None -> 0
+          }
+
+        let contributed = previous + amount
+
+        // Dummy insert to mimic state update (not persistent here)
+        expect _updated_dict =
+          dict.insert(
+            vault_dict,
+            contributor,
+            contributed
+          )
+
+        let new_raised = raised + amount
+
+        valid_amount && alive && new_raised >= raised
       }
-      
-      Fund { amount } -> {
-        // Validate funding
-        let input_campaign = find_input_campaign(transaction, output_reference)?
-        
-        and {
-          amount > 0,
-          input_campaign.alive == True,
-          datum.raised == input_campaign.raised + amount,
-          datum.goal == input_campaign.goal,
-          datum.boss == input_campaign.boss,
-          datum.alive == input_campaign.alive,
-          datum.project_id == input_campaign.project_id,
-        }
+
+      Claim(_) -> alive && raised >= goal && signer_present
+
+      Refund(_, caller, amount) -> {
+        let contributed =
+          when dict.get(vault_dict, caller) is {
+            Some(value) -> value
+            None -> 0
+          }
+
+        !alive && raised < goal && amount == contributed
       }
-      
-      Claim { amount } -> {
-        // Validate claiming funds
-        let input_campaign = find_input_campaign(transaction, output_reference)?
-        
-        and {
-          must_be_signed_by(transaction, datum.boss),
-          input_campaign.raised >= input_campaign.goal,
-          input_campaign.alive == True,
-          amount <= input_campaign.raised,
-          datum.alive == False,
-          datum.boss == input_campaign.boss,
-          datum.goal == input_campaign.goal,
-          datum.raised == input_campaign.raised,
-          datum.project_id == input_campaign.project_id,
-        }
-      }
-      
-      Refund -> {
-        // Validate refund
-        let input_campaign = find_input_campaign(transaction, output_reference)?
-        
-        and {
-          input_campaign.raised < input_campaign.goal,
-          !input_campaign.alive,
-          datum.alive == False,
-          datum.boss == input_campaign.boss,
-          datum.goal == input_campaign.goal,
-          datum.raised == input_campaign.raised,
-          datum.project_id == input_campaign.project_id,
-        }
-      }
-      
-      Kill -> {
-        // Validate campaign termination
-        let input_campaign = find_input_campaign(transaction, output_reference)?
-        
-        and {
-          must_be_signed_by(transaction, datum.boss),
-          input_campaign.raised < input_campaign.goal,
-          input_campaign.alive == True,
-          datum.alive == False,
-          datum.boss == input_campaign.boss,
-          datum.goal == input_campaign.goal,
-          datum.raised == input_campaign.raised,
-          datum.project_id == input_campaign.project_id,
-        }
-      }
+
+      Kill(_) -> alive && raised < goal && signer_present
     }
   }
-} 
+
+  else(_) {
+    fail
+  }
+}
