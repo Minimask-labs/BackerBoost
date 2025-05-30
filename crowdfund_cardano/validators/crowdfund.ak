@@ -3,7 +3,7 @@ use aiken/collection/list
 use aiken/crypto.{VerificationKeyHash}
 use cardano/transaction.{OutputReference, Transaction}
 
-// Campaign state stored in Datum as a list of tuples
+
 pub type Campaign {
   boss: VerificationKeyHash,
   goal: Int,
@@ -12,7 +12,7 @@ pub type Campaign {
   vault: List<(VerificationKeyHash, Int)>,
 }
 
-// Redeemer actions
+
 pub type Action {
   Start(Int)
   Fund(Int, VerificationKeyHash)
@@ -34,17 +34,13 @@ validator campaign_validator {
   ) {
     expect Some(Campaign { boss, goal, raised, alive, vault }) = datum
 
-    // Convert List<(VerificationKeyHash, Int)> into Dict<ByteArray, Int>
     let vault_dict =
       dict.from_pairs(list.map(vault, fn((k, v)) { Pair(k, v) }))
 
-    // Check if boss signed the transaction
     let signer_present = list.any(tx.extra_signatories, fn(vk) { vk == boss })
 
     when redeemer.action is {
-      Start(_) ->
-        // Invalid on-chain; campaign must already exist
-        False
+      Start(_) -> False
 
       Fund(amount, contributor) -> {
         let valid_amount = amount > 0
@@ -57,7 +53,6 @@ validator campaign_validator {
 
         let contributed = previous + amount
 
-        // Dummy insert to mimic state update (not persistent here)
         expect _updated_dict =
           dict.insert(
             vault_dict,
