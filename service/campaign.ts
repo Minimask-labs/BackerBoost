@@ -16,6 +16,7 @@
     throw error;
   }
 };
+
 export const createCampaign = async (payload: any ) => {
   try {
     const response = await AxiosService.post(`campaign`, payload);
