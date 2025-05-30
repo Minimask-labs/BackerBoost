@@ -17,6 +17,7 @@ interface UserState {
   loadUserType: () => void;
   saveUserType: (data: any) => void;
   currencySign: string;
+  logout: () => void;
 }
 const currentDate = new Date();
 const newDate = new Date(currentDate);
@@ -121,5 +122,11 @@ export const useStore = create<UserState>((set) => ({
   loadUserType: () => {
     const data = getFromCookies('userType');
     set({ userType: data });
+  },
+  logout: () => {
+    removeFromCookies('userData');
+    removeFromCookies('token');
+    removeFromCookies('userType');
+    set({ userData: null, token: null, userType: null });
   }
 }));
