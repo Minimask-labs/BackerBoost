@@ -13,33 +13,6 @@ import { ArrowLeft, Share2, Clock, Calendar, Target, CreditCard, Bitcoin } from 
 import { useCampaignStore } from '@/store/campaign';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 // Mock campaign data - in a real app, this would come from an API
-const campaignData = {
-  id: "1",
-  title: "College Tuition Fund",
-  description:
-    "I'm raising funds to pursue my computer science degree at a top university. This has been my dream since childhood, and with your support, I can make it happen. The funds will cover tuition, books, and living expenses for my first year of studies. I'm committed to working hard and giving back to the community once I graduate.",
-  category: "Education",
-  targetAmount: 15000,
-  currentAmount: 8750,
-  deadline: "2025-06-15",
-  paymentType: "Both",
-  creator: "Alex Johnson",
-  createdAt: "2025-01-15",
-  updates: [
-    {
-      date: "2025-02-10",
-      content:
-        "Thank you to everyone who has contributed so far! I've received my acceptance letter and will be starting in the fall semester.",
-    },
-  ],
-  contributors: [
-    { name: "Anonymous", amount: 500, date: "2025-02-01" },
-    { name: "Sarah M.", amount: 1000, date: "2025-01-25" },
-    { name: "Anonymous", amount: 250, date: "2025-01-20" },
-    { name: "David K.", amount: 2000, date: "2025-01-18" },
-    { name: "Anonymous", amount: 5000, date: "2025-01-16" },
-  ],
-}
 
 export default function CampaignPage() {
   const [contributionAmount, setContributionAmount] = useState("")

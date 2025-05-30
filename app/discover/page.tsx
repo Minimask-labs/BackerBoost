@@ -10,16 +10,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BackerBoostLogo } from "@/components/backerboost-logo"
 import { ArrowRight, Search, Filter } from "lucide-react"
 import {useCampaignStore} from "@/store/campaign"
-
+import {useCategoryStore} from "@/store/category"
 export default function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
   const [paymentFilter, setPaymentFilter] = useState("")
   const { fetchCampaigns, campaigns } = useCampaignStore();
-  
+  const { fetchCategories, categories } = useCategoryStore();
 useEffect(() => {
   fetchCampaigns();
 }, []);
+useEffect(() => {
+  fetchCategories();
+ }, []);
+  console.log(categories);
+
   return (
     <div className="container py-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -54,12 +59,9 @@ useEffect(() => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="education">Education</SelectItem>
-              <SelectItem value="medical">Medical</SelectItem>
-              <SelectItem value="startup">Startup</SelectItem>
-              <SelectItem value="charity">Charity</SelectItem>
-              <SelectItem value="creative">Creative</SelectItem>
-              <SelectItem value="personal">Personal</SelectItem>
+               {categories?.map((category: any, index: number) => (
+                <SelectItem key={index} value={category?._id}>{category?.name}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select onValueChange={setPaymentFilter}>
@@ -67,7 +69,6 @@ useEffect(() => {
               <SelectValue placeholder="Payment Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="crypto">Crypto</SelectItem>
               <SelectItem value="fiat">Fiat</SelectItem>
               <SelectItem value="both">Both</SelectItem>
