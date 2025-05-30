@@ -268,7 +268,7 @@ const Home: NextPage = () => {
                 <b>Role:</b> {userData?.role}
               </p>
               <p>
-                <b>Wallet:</b> {userData?.walletAddress}
+                <b>Wallet:</b> {userData?.walletAddress?.slice(0, 50)}...
               </p>
 
               <button
