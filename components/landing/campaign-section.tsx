@@ -1,3 +1,5 @@
+"use client"
+
 import { featuredCampaigns } from "@/constants";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";

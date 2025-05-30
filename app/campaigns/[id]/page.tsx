@@ -65,20 +65,20 @@ export default function CampaignPage() {
       </div>
     );
 
-  // if (!campaign)
-  //   return (
-  //     <NotFound />
-  //   );
+  if (!campaign)
+    return (
+      <NotFound />
+    );
 
   // Calculate remaining time
-const deadline = new Date(campaign.deadline || Date.now());
+const deadline = new Date(campaign?.deadline || Date.now());
 const currentDate = new Date();
-const timeDifference = deadline.getTime() - currentDate.getTime();
+const timeDifference = deadline?.getTime() - currentDate.getTime();
 const daysRemaining = Math.max(
   0,
   Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
 );
-
+ 
   return (
     <div className="container max-4xl py-10">
       <Link href="/discover" className="inline-flex items-center text-sm mb-8">
@@ -94,12 +94,12 @@ const daysRemaining = Math.max(
               <div className="flex justify-between">
                 <div>
                   <span className="inline-flex rounded-lg bg-muted px-3 py-1 text-sm mb-2">
-                    {campaign.category || "General"}
+                    {/* {campaign?.category || "General"} */}
                   </span>
-                  <CardTitle className="text-2xl">{campaign.title}</CardTitle>
+                  <CardTitle className="text-2xl">{campaign?.title}</CardTitle>
                   <CardDescription>
                     Created on{" "}
-                    {new Date(campaign.createdAt).toUTCString().split(" ").slice(0, 4).join(" ")}
+                    {new Date(campaign?.createdAt).toUTCString().split(" ").slice(0, 4).join(" ")}
                   </CardDescription>
                 </div>
                 <Button variant="outline" size="icon">
@@ -119,12 +119,12 @@ const daysRemaining = Math.max(
                 <Stat
                   Icon={<Calendar />}
                   label="End Date"
-                  value={`${deadline.toUTCString().split(" ").slice(0, 4).join(" ")}`}
+                  value={`${deadline?.toUTCString().split(" ").slice(0, 4).join(" ")}`}
                 />
                 <Stat
                   Icon={<Target />}
                   label="Goal"
-                  value={`$${campaign.targetAmount.toLocaleString()}`}
+                  value={`$${campaign?.targetAmount.toLocaleString()}`}
                 />
                 <Stat
                   Icon={
@@ -145,18 +145,18 @@ const daysRemaining = Math.max(
                 </TabsList>
 
                 <TabsContent value="description" className="mt-4">
-                  <p className="whitespace-pre-line">{campaign.description}</p>
+                  <p className="whitespace-pre-line">{campaign?.description}</p>
                 </TabsContent>
 
                 <TabsContent value="updates" className="mt-4">
                   {campaign.updates?.length > 0 ? (
                     <div className="space-y-3">
-                      {campaign.updates.map((update: any, i: number) => (
+                      {campaign?.updates.map((update: any, i: number) => (
                         <div key={i} className="border-l-2 border-primary pl-4">
                           <p className="text-sm text-muted-foreground">
-                            {new Date(update.date).toLocaleDateString()}
+                            {new Date(update?.date).toLocaleDateString()}
                           </p>
-                          <p>{update.content}</p>
+                          <p>{update?.content}</p>
                         </div>
                       ))}
                     </div>
