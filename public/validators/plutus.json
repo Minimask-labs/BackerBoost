@@ -1,0 +1,196 @@
+{
+  "preamble": {
+    "title": "backerboost/crowdfund_cardano",
+    "description": "Aiken crowdfund_cardanos for project 'backerboost/crowdfund_cardano'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.17+c3a7fba"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "crowdfund.campaign_validator.spend",
+      "datum": {
+        "title": "datum",
+        "schema": {
+          "$ref": "#/definitions/crowdfund~1Campaign"
+        }
+      },
+      "redeemer": {
+        "title": "redeemer",
+        "schema": {
+          "$ref": "#/definitions/crowdfund~1Redeemer"
+        }
+      },
+      "compiledCode": "59043001010029800aba2aba1aba0aab9faab9eaab9dab9a488888896600264653001300800198041804800cdc3a400530080024888966002600460106ea800e26466446644b30013003300d3754013132598009809800c4c8c966002600c0031323259800980b801401e2c80a0dd6980a80098089baa0028acc004c028006264646644b30013019003804c590161bae3016001375a602c004602c00260226ea800a2b30013370e9002000c4c8c966002602e0050078b2028375a602a00260226ea800a2b30013370e9003000c4c8c8ca60026eb4c05c0066eb4c05c00e6eb8c05c00922259800980d802402e2c80c0602e002602c00260226ea800a2b30013370e9004000c4c8c966002602e0050078b2028375a602a00260226ea800a2c807900f201e403c8078c03cdd50009809000c5901018071baa0098b2018159800980098059baa0028999119911919914c004c030c048dd5180b0014c8cc004004c8cc004004dd6180c180c802112cc004006297adef6c6089980c1919bb0301a001301a301b0013758603200266004004603400280b8896600200314bd6f7b63044ca6002660060066034005375c602a003375a602c0028020c0600050164c048dd50034c8cc004004dd6180b980c180c180c180c180c180c180c180c180a1baa00c2259800800c528456600266e3cdd7180c0008034528c4cc008008c064005013202c9bad30160059bad3016003488888966002601c00914a1132598009809802c4c8cc88c96600266e2120000038acc00402e266e24018cdc0003001c52820388a5040713001009800ccdc0192cc004c04cc074dd5000c4dd69810980f1baa0018a400080e0cc01002400400900b1bad301e001375c603c603e00260346ea80362b30013370e9002002c56600200f15980099b890030028802452820308a50406115980099b8748018016264b30019800804528528a0328acc004cdc400180244cdc39bad301e301f00132598009808980d9baa00189bad301f301c375400314800101a198010039bae301e0018a50406514a080c8c078c068dd5006c56600200f15980099b880020038802452820308a50406080c101820302232330010010032259800800c530103d87a8000899192cc004cdc8802800c56600266e3c014006266e95200033021301f0024bd7045300103d87a80004075133004004302300340746eb8c074004c08000501e202e180a8009111919800800802112cc00400626603066ec0dd48021ba80034bd6f7b63044ca60026eb8c0580066eb4c05c00660360049112cc004cdc8004001c4cc070cdd81ba9008375000e00b15980099b8f00800389980e19bb037520106ea001c00626603866ec0dd48019ba800233006006001406080c0603200280b8c050008c048008dd7180880118061baa300f300c3754004601e60186ea801e2c8050c03c00cc034c038004dc3a400060126ea800e2c8038601000260066ea802229344d9590011",
+      "hash": "095d28ce0a1c3c4ed51655b5384632ac8cd25d8642030387a538936a"
+    },
+    {
+      "title": "crowdfund.campaign_validator.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "compiledCode": "59043001010029800aba2aba1aba0aab9faab9eaab9dab9a488888896600264653001300800198041804800cdc3a400530080024888966002600460106ea800e26466446644b30013003300d3754013132598009809800c4c8c966002600c0031323259800980b801401e2c80a0dd6980a80098089baa0028acc004c028006264646644b30013019003804c590161bae3016001375a602c004602c00260226ea800a2b30013370e9002000c4c8c966002602e0050078b2028375a602a00260226ea800a2b30013370e9003000c4c8c8ca60026eb4c05c0066eb4c05c00e6eb8c05c00922259800980d802402e2c80c0602e002602c00260226ea800a2b30013370e9004000c4c8c966002602e0050078b2028375a602a00260226ea800a2c807900f201e403c8078c03cdd50009809000c5901018071baa0098b2018159800980098059baa0028999119911919914c004c030c048dd5180b0014c8cc004004c8cc004004dd6180c180c802112cc004006297adef6c6089980c1919bb0301a001301a301b0013758603200266004004603400280b8896600200314bd6f7b63044ca6002660060066034005375c602a003375a602c0028020c0600050164c048dd50034c8cc004004dd6180b980c180c180c180c180c180c180c180c180a1baa00c2259800800c528456600266e3cdd7180c0008034528c4cc008008c064005013202c9bad30160059bad3016003488888966002601c00914a1132598009809802c4c8cc88c96600266e2120000038acc00402e266e24018cdc0003001c52820388a5040713001009800ccdc0192cc004c04cc074dd5000c4dd69810980f1baa0018a400080e0cc01002400400900b1bad301e001375c603c603e00260346ea80362b30013370e9002002c56600200f15980099b890030028802452820308a50406115980099b8748018016264b30019800804528528a0328acc004cdc400180244cdc39bad301e301f00132598009808980d9baa00189bad301f301c375400314800101a198010039bae301e0018a50406514a080c8c078c068dd5006c56600200f15980099b880020038802452820308a50406080c101820302232330010010032259800800c530103d87a8000899192cc004cdc8802800c56600266e3c014006266e95200033021301f0024bd7045300103d87a80004075133004004302300340746eb8c074004c08000501e202e180a8009111919800800802112cc00400626603066ec0dd48021ba80034bd6f7b63044ca60026eb8c0580066eb4c05c00660360049112cc004cdc8004001c4cc070cdd81ba9008375000e00b15980099b8f00800389980e19bb037520106ea001c00626603866ec0dd48019ba800233006006001406080c0603200280b8c050008c048008dd7180880118061baa300f300c3754004601e60186ea801e2c8050c03c00cc034c038004dc3a400060126ea800e2c8038601000260066ea802229344d9590011",
+      "hash": "095d28ce0a1c3c4ed51655b5384632ac8cd25d8642030387a538936a"
+    }
+  ],
+  "definitions": {
+    "Bool": {
+      "title": "Bool",
+      "anyOf": [
+        {
+          "title": "False",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        },
+        {
+          "title": "True",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": []
+        }
+      ]
+    },
+    "Int": {
+      "dataType": "integer"
+    },
+    "List$Tuple$aiken/crypto/VerificationKeyHash_Int": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/Tuple$aiken~1crypto~1VerificationKeyHash_Int"
+      }
+    },
+    "Tuple$aiken/crypto/VerificationKeyHash_Int": {
+      "title": "Tuple",
+      "dataType": "list",
+      "items": [
+        {
+          "$ref": "#/definitions/aiken~1crypto~1VerificationKeyHash"
+        },
+        {
+          "$ref": "#/definitions/Int"
+        }
+      ]
+    },
+    "aiken/crypto/VerificationKeyHash": {
+      "title": "VerificationKeyHash",
+      "dataType": "bytes"
+    },
+    "crowdfund/Action": {
+      "title": "Action",
+      "anyOf": [
+        {
+          "title": "Start",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        },
+        {
+          "title": "Fund",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": [
+            {
+              "$ref": "#/definitions/Int"
+            },
+            {
+              "$ref": "#/definitions/aiken~1crypto~1VerificationKeyHash"
+            }
+          ]
+        },
+        {
+          "title": "Claim",
+          "dataType": "constructor",
+          "index": 2,
+          "fields": [
+            {
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        },
+        {
+          "title": "Refund",
+          "dataType": "constructor",
+          "index": 3,
+          "fields": [
+            {
+              "$ref": "#/definitions/Int"
+            },
+            {
+              "$ref": "#/definitions/aiken~1crypto~1VerificationKeyHash"
+            },
+            {
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        },
+        {
+          "title": "Kill",
+          "dataType": "constructor",
+          "index": 4,
+          "fields": [
+            {
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        }
+      ]
+    },
+    "crowdfund/Campaign": {
+      "title": "Campaign",
+      "anyOf": [
+        {
+          "title": "Campaign",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "boss",
+              "$ref": "#/definitions/aiken~1crypto~1VerificationKeyHash"
+            },
+            {
+              "title": "goal",
+              "$ref": "#/definitions/Int"
+            },
+            {
+              "title": "raised",
+              "$ref": "#/definitions/Int"
+            },
+            {
+              "title": "alive",
+              "$ref": "#/definitions/Bool"
+            },
+            {
+              "title": "vault",
+              "$ref": "#/definitions/List$Tuple$aiken~1crypto~1VerificationKeyHash_Int"
+            }
+          ]
+        }
+      ]
+    },
+    "crowdfund/Redeemer": {
+      "title": "Redeemer",
+      "anyOf": [
+        {
+          "title": "Redeemer",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "action",
+              "$ref": "#/definitions/crowdfund~1Action"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -44,7 +44,7 @@ export default function CampaignPage() {
   // BASICALLY A LOADING STATE...
   if (loading)
     return (
-      <div className="container max-w-full py-10 text-center h-full">
+      <div className="container max-w-4xl py-10 text-center h-full">
         <Card key={`${campaign}`} className="overflow-hidden">
           <CardHeader className="p-6">
             <div className="h-6 bg-muted rounded animate-pulse mb-4"></div>
@@ -80,7 +80,7 @@ const daysRemaining = Math.max(
 );
 
   return (
-    <div className="container max-w-full py-10">
+    <div className="container max-4xl py-10">
       <Link href="/discover" className="inline-flex items-center text-sm mb-8">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Campaigns
@@ -151,7 +151,7 @@ const daysRemaining = Math.max(
                 <TabsContent value="updates" className="mt-4">
                   {campaign.updates?.length > 0 ? (
                     <div className="space-y-3">
-                      {campaign.updates.map((update, i) => (
+                      {campaign.updates.map((update: any, i: number) => (
                         <div key={i} className="border-l-2 border-primary pl-4">
                           <p className="text-sm text-muted-foreground">
                             {new Date(update.date).toLocaleDateString()}
