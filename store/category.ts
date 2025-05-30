@@ -5,7 +5,7 @@ import {
   getSingleConversation,
   sendMessage,
   viewMessages,
-} from "@/service/chat";
+} from "@/service/category";
 
 export type UserState = {
   status: "idle" | "loading" | "succeeded" | "failed";
