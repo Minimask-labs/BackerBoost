@@ -15,7 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { ArrowRight } from "lucide-react";
-import { myCampaigns } from "@/service/campaign";
+import { myCampaigns, userCampaigns } from "@/service/campaign";
 import UserInfoCard from "@/components/user-info-card";
 
 // Dynamically import wallet connect to avoid SSR issues
@@ -37,7 +37,7 @@ const DashboardPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const campaignData = await myCampaigns();
+        const campaignData = await userCampaigns();
         setCampaigns(campaignData.data);
         console.log("campaign", campaignData.data);
       } catch (err: any) {
