@@ -64,10 +64,11 @@ export default function CampaignPage() {
         </Card>
       </div>
     );
-  if (!campaign)
-    return (
-      <NotFound />
-    );
+
+  // if (!campaign)
+  //   return (
+  //     <NotFound />
+  //   );
 
   // Calculate remaining time
 const deadline = new Date(campaign.deadline || Date.now());
