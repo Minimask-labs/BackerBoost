@@ -5,8 +5,7 @@
   export const myCampaigns = async (params?:any) => {
   try {
     const response = await AxiosService.get(
-      `campaign 
-`,
+      `campaign`,
       {
         params: params
       }
