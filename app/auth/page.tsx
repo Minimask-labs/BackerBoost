@@ -1,6 +1,6 @@
 'use client';
 // import { UserTypeSelection } from '@/components/aleo/walletAuth';
-import CardanoWalletConnect from '@/components/cardano-wallet-connect';
+import CardanoWalletConnect from '@/components/cardanoWalletConnect';
 import React from 'react';
 export default function AuthPage() {
   return (
