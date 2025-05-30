@@ -1,22 +1,52 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { BackerBoostLogo } from "@/components/backerboost-logo"
-import { ArrowLeft } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { BackerBoostLogo } from "@/components/backerboost-logo";
+import { ArrowLeft } from "lucide-react";
+import { createCampaign } from "@/service/campaign";
+import * as z from "zod";
+
+const CampaignSchema = z.object({
+  title: z.string().min(5, { message: "Title must be at least 5 characters" }),
+  description: z
+    .string()
+    .min(20, { message: "Description must be at least 20 characters" }),
+  category: z.string().min(1, { message: "Category is required" }),
+  targetAmount: z
+    .string()
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Target amount must be a positive number",
+    }),
+  deadline: z.string().min(1, { message: "Deadline is required" }),
+  paymentType: z.enum(["crypto", "fiat", "both"]),
+});
 
 export default function CreateCampaignPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -24,29 +54,46 @@ export default function CreateCampaignPage() {
     targetAmount: "",
     deadline: "",
     paymentType: "both",
-  })
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // In a real app, this would send data to the backend
-    console.log("Campaign data:", formData)
-
-    // Redirect to a success page or the campaign page
-    router.push("/campaigns/success")
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+    const result = CampaignSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+    try {
+      console.log("Campaign data:", formData);
+      const campaign = await createCampaign(formData);
+      if (campaign) {
+        router.push("/campaigns/success");
+      }
+    } catch (error) {
+      console.log("Error creating campaign");
+    }
+  };
 
   // Calculate minimum date (today)
-  const today = new Date()
-  const minDate = today.toISOString().split("T")[0]
+  const today = new Date();
+  const minDate = today.toISOString().split("T")[0];
 
   return (
     <div className="container max-w-4xl py-10">
@@ -63,7 +110,9 @@ export default function CreateCampaignPage() {
         <BackerBoostLogo className="h-12 w-12" />
         <div>
           <h1 className="text-3xl font-bold">Create Your Campaign</h1>
-          <p className="text-muted-foreground">Set up your funding request and share it with the world</p>
+          <p className="text-muted-foreground">
+            Set up your funding request and share it with the world
+          </p>
         </div>
       </div>
       <Card>
@@ -71,7 +120,8 @@ export default function CreateCampaignPage() {
           <CardHeader>
             <CardTitle>Campaign Details</CardTitle>
             <CardDescription>
-              Provide information about your funding request. Be clear and specific to attract contributors.
+              Provide information about your funding request. Be clear and
+              specific to attract contributors.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -85,6 +135,9 @@ export default function CreateCampaignPage() {
                 onChange={handleChange}
                 required
               />
+              {errors.title && (
+                <p className="text-sm text-red-500">{errors.title}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Campaign Description</Label>
@@ -97,11 +150,19 @@ export default function CreateCampaignPage() {
                 onChange={handleChange}
                 required
               />
+              {errors.description && (
+                <p className="text-sm text-red-500">{errors.description}</p>
+              )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="category">Purpose Category</Label>
-                <Select onValueChange={(value) => handleSelectChange("category", value)} required>
+                <Select
+                  onValueChange={(value) =>
+                    handleSelectChange("category", value)
+                  }
+                  required
+                >
                   <SelectTrigger id="category">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
@@ -115,6 +176,9 @@ export default function CreateCampaignPage() {
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.category && (
+                  <p className="text-sm text-red-500">{errors.category}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="targetAmount">Target Amount ($)</Label>
@@ -128,6 +192,9 @@ export default function CreateCampaignPage() {
                   onChange={handleChange}
                   required
                 />
+                {errors.targetAmount && (
+                  <p className="text-sm text-red-500">{errors.targetAmount}</p>
+                )}
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -142,13 +209,18 @@ export default function CreateCampaignPage() {
                   onChange={handleChange}
                   required
                 />
+                {errors.deadline && (
+                  <p className="text-sm text-red-500">{errors.deadline}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>Payment Type</Label>
                 <RadioGroup
                   defaultValue="both"
                   className="flex gap-4"
-                  onValueChange={(value) => handleSelectChange("paymentType", value)}
+                  onValueChange={(value) =>
+                    handleSelectChange("paymentType", value)
+                  }
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="crypto" id="crypto" />
@@ -169,11 +241,18 @@ export default function CreateCampaignPage() {
                     </Label>
                   </div>
                 </RadioGroup>
+                {errors.paymentType && (
+                  <p className="text-sm text-red-500">{errors.paymentType}</p>
+                )}
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" onClick={() => router.push("/")}>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => router.push("/")}
+            >
               Cancel
             </Button>
             <Button type="submit">Create Campaign</Button>
@@ -181,6 +260,5 @@ export default function CreateCampaignPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }
-

@@ -12,9 +12,11 @@
     throw error;
   }
 };
+
 export const createCampaign = async (payload: any ) => {
   try {
-    const response = await AxiosService.post(`campaign/employer`, payload);
+    const response = await AxiosService.post(`campaign`, payload);
+    console.log(response)
     return response.data; // Assuming you want to return the updated user data
   } catch (error) {
     throw error;
