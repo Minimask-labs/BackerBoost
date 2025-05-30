@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Share2, Clock, Calendar, Target, CreditCard, Bitcoin } from "lucide-react"
 import { useCampaignStore } from '@/store/campaign';
-import { Route } from "next"
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 // Mock campaign data - in a real app, this would come from an API
 const campaignData = {
   id: "1",
@@ -41,19 +41,21 @@ const campaignData = {
   ],
 }
 
-export default function CampaignPage({ params }: { params: { id: string } }) {
+export default function CampaignPage() {
   const [contributionAmount, setContributionAmount] = useState("")
   const [contributorName, setContributorName] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("card")
   const { fetchCampaignsDetails, campaign_details } = useCampaignStore();
+    const params = useParams();
+  const campaignId = params.id;
 
   // Calculate days remaining
-  const deadline = new Date(campaignData.deadline)
+  const deadline = new Date(campaign_details?.deadline)
   const today = new Date()
   const daysRemaining = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   // Calculate progress percentage
-  const progressPercentage = (campaignData.currentAmount / campaignData.targetAmount) * 100
+  const progressPercentage = (campaign_details?.currentAmount / campaign_details?.targetAmount) * 100
 
   const handleContribute = (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,9 +70,13 @@ export default function CampaignPage({ params }: { params: { id: string } }) {
     navigator.clipboard.writeText(window.location.href)
     alert("Campaign link copied to clipboard!")
   }
+      console.log(campaign_details);
+
 useEffect(() => {
-  // if(route)
-  fetchCampaignsDetails();
+  if(campaignId){
+    fetchCampaignsDetails({ _id: campaignId as string });
+    console.log(campaign_details);
+  }
 }, []);
   return (
     <div className="container max-w-4xl py-10">
@@ -91,11 +97,11 @@ useEffect(() => {
               <div className="flex justify-between items-start">
                 <div>
                   <div className="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-sm mb-2">
-                    {campaignData.category}
+                    {campaign_details?.category}
                   </div>
-                  <CardTitle className="text-2xl md:text-3xl">{campaignData.title}</CardTitle>
+                  <CardTitle className="text-2xl md:text-3xl">{campaign_details?.title}</CardTitle>
                   <CardDescription>
-                    Created by {campaignData.creator} on {new Date(campaignData.createdAt).toLocaleDateString()}
+                    Created by {campaign_details?.creator} on {new Date(campaign_details?.createdAt).toLocaleDateString()}
                   </CardDescription>
                 </div>
                 <Button variant="outline" size="icon" onClick={handleShare}>
@@ -107,8 +113,8 @@ useEffect(() => {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="font-medium">${campaignData.currentAmount.toLocaleString()}</span>
-                    <span className="text-muted-foreground">of ${campaignData.targetAmount.toLocaleString()}</span>
+                    <span className="font-medium">${campaign_details?.currentAmount.toLocaleString()}</span>
+                    <span className="text-muted-foreground">of ${campaign_details?.targetAmount.toLocaleString()}</span>
                   </div>
                   <Progress value={progressPercentage} className="h-2" />
                   <div className="flex justify-between text-sm">
@@ -129,27 +135,27 @@ useEffect(() => {
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="text-sm font-medium">End Date</p>
-                      <p className="text-lg font-bold">{new Date(campaignData.deadline).toLocaleDateString()}</p>
+                      <p className="text-lg font-bold">{new Date(campaign_details?.deadline).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 p-3 border rounded-lg">
                     <Target className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="text-sm font-medium">Goal</p>
-                      <p className="text-lg font-bold">${campaignData.targetAmount.toLocaleString()}</p>
+                      <p className="text-lg font-bold">${campaign_details?.targetAmount.toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 p-3 border rounded-lg">
                     <div className="flex">
                       <CreditCard className="h-5 w-5 text-muted-foreground" />
-                      {campaignData.paymentType === "Both" && (
+                      {campaign_details?.paymentType === "Both" && (
                         <Bitcoin className="h-5 w-5 text-muted-foreground ml-1" />
                       )}
                     </div>
                     <div>
                       <p className="text-sm font-medium">Payment</p>
                       <p className="text-lg font-bold">
-                        {campaignData.paymentType === "Both" ? "Crypto & Fiat" : campaignData.paymentType}
+                        {campaign_details?.paymentType === "Both" ? "Crypto & Fiat" : campaign_details?.paymentType}
                       </p>
                     </div>
                   </div>
@@ -162,12 +168,12 @@ useEffect(() => {
                     <TabsTrigger value="contributors">Contributors</TabsTrigger>
                   </TabsList>
                   <TabsContent value="description" className="mt-4">
-                    <p className="whitespace-pre-line">{campaignData.description}</p>
+                    <p className="whitespace-pre-line">{campaign_details?.description}</p>
                   </TabsContent>
                   <TabsContent value="updates" className="mt-4">
-                    {campaignData.updates.length > 0 ? (
+                    {campaign_details?.updates.length > 0 ? (
                       <div className="space-y-4">
-                        {campaignData.updates.map((update, index) => (
+                        {campaign_details?.updates?.map((update: any, index: number) => (
                           <div key={index} className="border-l-2 border-primary pl-4">
                             <p className="text-sm text-muted-foreground">
                               {new Date(update.date).toLocaleDateString()}
@@ -182,7 +188,7 @@ useEffect(() => {
                   </TabsContent>
                   <TabsContent value="contributors" className="mt-4">
                     <div className="space-y-4">
-                      {campaignData.contributors.map((contributor, index) => (
+                      {campaign_details?.contributors?.map((contributor: any, index: number) => (
                         <div key={index} className="flex justify-between items-center border-b pb-2">
                           <div>
                             <p className="font-medium">{contributor.name}</p>
