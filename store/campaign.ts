@@ -30,7 +30,7 @@ export type UserActions = {
 
 export type UserStore = UserState & UserActions;
 
-export const usecampaignstore = create<UserStore>((set) => ({
+export const useCampaignStore = create<UserStore>((set) => ({
 
   campaigns: null,
   campaign_details: null,

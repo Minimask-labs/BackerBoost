@@ -2,11 +2,15 @@
 
 
 //  ****************** campaigns *******************
-  export const myCampaigns = async (params:any) => {
+  export const myCampaigns = async (params?:any) => {
   try {
-    const response = await AxiosService.get('campaign/ ', {
-      params: params
-    });
+    const response = await AxiosService.get(
+      `campaign 
+`,
+      {
+        params: params
+      }
+    );
     return response?.data; // Assuming you want to return the updated user data
   } catch (error) {
     throw error;
@@ -24,9 +28,12 @@ export const createCampaign = async (payload: any ) => {
     _id: string;
    }) => {
     try {
-      const response = await AxiosService.get(`campaign`, {
-        params: params
-      });
+      const response = await AxiosService.get(
+        `campaign/retrieve`,
+        {
+          params: params
+        }
+      );
       return response?.data; // Assuming you want to return the updated user data
     } catch (error) {
       throw error;

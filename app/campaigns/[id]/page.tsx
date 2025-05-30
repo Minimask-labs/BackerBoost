@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Share2, Clock, Calendar, Target, CreditCard, Bitcoin } from "lucide-react"
-
+import { useCampaignStore } from '@/store/campaign';
+import { Route } from "next"
 // Mock campaign data - in a real app, this would come from an API
 const campaignData = {
   id: "1",
@@ -44,6 +45,7 @@ export default function CampaignPage({ params }: { params: { id: string } }) {
   const [contributionAmount, setContributionAmount] = useState("")
   const [contributorName, setContributorName] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("card")
+  const { fetchCampaignsDetails, campaign_details } = useCampaignStore();
 
   // Calculate days remaining
   const deadline = new Date(campaignData.deadline)
@@ -66,7 +68,10 @@ export default function CampaignPage({ params }: { params: { id: string } }) {
     navigator.clipboard.writeText(window.location.href)
     alert("Campaign link copied to clipboard!")
   }
-
+useEffect(() => {
+  // if(route)
+  fetchCampaignsDetails();
+}, []);
   return (
     <div className="container max-w-4xl py-10">
       <div className="mb-8">
