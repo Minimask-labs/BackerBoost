@@ -1,3 +1,4 @@
+'use client';
 import CampaignSection from "@/components/landing/campaign-section";
 import FooterSection from "@/components/landing/footer";
 import FundCampaign from "@/components/landing/fund-campaign";
