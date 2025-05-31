@@ -44,16 +44,24 @@ export const useCampaignStore = create<UserStore>((set) => ({
     set({ loading: true, status: 'loading', error: null });
     try {
       const response = await myCampaigns(params);
+      console.log("response", response.data)
       set({
         loading: false,
         campaigns: response.data,
         status: 'succeeded'
       });
+      return response.data
+      // set({
+      //   loading: false,
+      //   campaigns: response.data,
+      //   status: 'succeeded'
+      // });
     } catch (error: any) {
       set({ loading: false, status: 'failed', error: error.message });
       throw error;
     }
   },
+
   fetchCampaignsDetails: async (params?: any) => {
     set({ loading: true, status: 'loading', error: null });
     try {

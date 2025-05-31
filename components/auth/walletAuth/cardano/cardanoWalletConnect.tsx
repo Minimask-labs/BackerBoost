@@ -3,6 +3,7 @@ import type { NextPage } from 'next';
 import { useWallet, CardanoWallet } from '@meshsdk/react';
 import { BlockfrostProvider } from '@meshsdk/core';
 import { walletAuth } from '@/service/auth';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -46,14 +47,16 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   // Authentication states
-  // const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
-  // const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  // const [userToken, setUserToken] = useState<string | null>(null);
-  // const [userData, setUserData] = useState<any>(null);
+  const [userToken, setUserToken] = useState<string | null>(null);
+  const [userData, setUserData] = useState<any>(null);
   const [currentStep, setCurrentStep] = useState<
     'idle' | 'signing' | 'authenticating'
   >('idle');
+
+  const router = useRouter();
 
   // Load saved auth data on mount
   // useEffect(() => {
@@ -69,11 +72,19 @@ const Home: NextPage = () => {
 
   // Auto-authenticate when wallet connects
   useEffect(() => {
-    if (connected && wallet) {
+    if (connected && wallet && !isAuthenticated && !isAuthenticating) {
       console.log('Wallet connected, initiating automatic authentication');
       handleAuthentication();
     }
-  }, [connected, wallet]);
+  }, [connected, wallet, isAuthenticated, isAuthenticating]);
+
+  // Log out when wallet disconnects
+  useEffect(() => {
+    if (!connected && isAuthenticated) {
+      console.log('Wallet disconnected, logging out...');
+      handleLogout();
+    }
+  }, [connected, isAuthenticated]);
 
   async function getAssets() {
     if (wallet) {
@@ -93,9 +104,9 @@ const Home: NextPage = () => {
   }
 
   const handleAuthentication = async () => {
-    if (!wallet || !connected ) return;
+    if (!wallet || !connected) return;
 
-    // setIsAuthenticating(true);
+    setIsAuthenticating(true);
     setAuthError(null);
     setCurrentStep('signing');
 
@@ -133,14 +144,16 @@ const Home: NextPage = () => {
         // Save authentication data
         saveUserToken(response.data.token);
         saveUserData(response.data.user);
-        // setIsAuthenticated(true);
+        setUserToken(response.data.token);
+        setUserData(response.data.user);
+        setIsAuthenticated(true);
 
         // Persist to localStorage
-        // localStorage.setItem('cardano_auth_token', response.data.token);
-        // localStorage.setItem(
-        //   'cardano_user_data',
-        //   JSON.stringify(response.data.user)
-        // );
+        localStorage.setItem('cardano_auth_token', response.data.token);
+        localStorage.setItem(
+          'cardano_user_data',
+          JSON.stringify(response.data.user)
+        );
 
         console.log('Authentication successful:', response);
 
@@ -150,23 +163,25 @@ const Home: NextPage = () => {
           // router.push('/onboarding');
         } else {
           console.log('Returning user, redirect to dashboard');
-          // router.push('/dashboard');
+          router.push('/dashboard');
         }
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
       setAuthError(error.message || 'Authentication failed');
     } finally {
-      // setIsAuthenticating(false);
+      setIsAuthenticating(false);
       setCurrentStep('idle');
     }
   };
 
   const handleLogout = () => {
-    // setIsAuthenticated(false);
+    setIsAuthenticated(false);
+    setUserToken(null);
+    setUserData(null);
+    setAuthError(null);
     disconnect();
-        logout();
-
+    logout();
   };
 
   const getAuthButtonText = () => {
@@ -196,16 +211,32 @@ const Home: NextPage = () => {
             individuals to create funding requests for specific goals and share
             them online.{' '}
           </CardDescription>
+          
+          {/* Status Indicators */}
           {connecting && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-blue-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Connecting wallet...</span>
+            </div>
+          )}
+          
+          {connected && isAuthenticated && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-green-600">
+              <Shield className="h-4 w-4" />
+              <span className="text-sm">Authenticated Successfully</span>
+            </div>
+          )}
+
+          {connected && isAuthenticating && (
             <div className="flex items-center justify-center gap-2 mt-2 text-blue-600">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">{getAuthButtonText()}</span>
             </div>
           )}
-          {connected && (
-            <div className="flex items-center justify-center gap-2 mt-2 text-green-600">
-              <Shield className="h-4 w-4" />
-              <span className="text-sm">Authenticated Successfully</span>
+
+          {authError && (
+            <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm">
+              Error: {authError}
             </div>
           )}
         </CardHeader>
@@ -254,12 +285,22 @@ const Home: NextPage = () => {
               </Button>
             )} */}
 
-            {connected && (
+            {connected && isAuthenticated && (
               <Button
                 onClick={handleLogout}
                 className="w-full bg-red-600 hover:bg-red-700"
               >
                 Disconnect & Logout
+              </Button>
+            )}
+
+            {connected && !isAuthenticated && !isAuthenticating && (
+              <Button
+                onClick={disconnect}
+                variant="outline"
+                className="w-full"
+              >
+                Disconnect Wallet
               </Button>
             )}
           </div>
