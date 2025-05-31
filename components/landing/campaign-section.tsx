@@ -64,7 +64,7 @@ const CampaignSection = () => {
             </>
           ) : (
             <>
-              {campaigns?.data?.map((campaign: any, index: number) => (
+              {campaigns?.data?.slice(0,3).map((campaign: any, index: number) => (
                 <Card key={index} className="overflow-hidden">
                   <CardHeader className="p-6">
                     <div className="flex items-center justify-between">
