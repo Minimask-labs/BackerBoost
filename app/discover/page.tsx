@@ -1,29 +1,56 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { BackerBoostLogo } from "@/components/backerboost-logo"
-import { ArrowRight, Search, Filter } from "lucide-react"
-import {useCampaignStore} from "@/store/campaign"
-import {useCategoryStore} from "@/store/category"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { BackerBoostLogo } from "@/components/backerboost-logo";
+import { ArrowRight, Search, Filter } from "lucide-react";
+
+import { useCampaignStore } from "@/store/campaign";
+import { useCategoryStore } from "@/store/category";
+
 export default function DiscoverPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState("")
-  const [paymentFilter, setPaymentFilter] = useState("")
-  const { fetchCampaigns, campaigns } = useCampaignStore();
-  const { fetchCategories, categories } = useCategoryStore();
-useEffect(() => {
-  fetchCampaigns();
-}, []);
-useEffect(() => {
-  fetchCategories();
- }, []);
-  console.log(categories);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState("");
+
+  const {
+    fetchCampaigns,
+    campaigns,
+    loading: campaignsLoading,
+  } = useCampaignStore();
+  const {
+    fetchCategories,
+    categories,
+    loading: categoriesLoading,
+  } = useCategoryStore();
+
+  useEffect(() => {
+    fetchCampaigns();
+     fetchCategories();
+  }, []);
 
   return (
     <div className="container py-10">
@@ -59,8 +86,10 @@ useEffect(() => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-               {categories?.map((category: any, index: number) => (
-                <SelectItem key={index} value={category?._id}>{category?.name}</SelectItem>
+              {categories?.map((category: any, index: number) => (
+                <SelectItem key={index} value={category?._id}>
+                  {category?.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -77,14 +106,38 @@ useEffect(() => {
         </div>
       </div>
 
-      {campaigns?.data?.length > 0 ? (
+      {campaignsLoading && categoriesLoading ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {Array(6)
+            .fill(0)
+            .map((_, index) => (
+              <Card key={index} className="overflow-hidden">
+                <CardHeader className="p-6">
+                  <div className="h-6 bg-muted rounded animate-pulse mb-4"></div>
+                  <div className="h-8 bg-muted rounded animate-pulse mb-2"></div>
+                  <div className="h-12 bg-muted rounded animate-pulse"></div>
+                </CardHeader>
+                <CardContent className="p-6 pt-0">
+                  <div className="space-y-4">
+                    <div className="h-4 bg-muted rounded animate-pulse"></div>
+                    <div className="h-2 bg-muted rounded animate-pulse"></div>
+                    <div className="h-4 bg-muted rounded animate-pulse"></div>
+                  </div>
+                </CardContent>
+                <CardFooter className="p-6 pt-0">
+                  <div className="h-10 w-full bg-muted rounded animate-pulse"></div>
+                </CardFooter>
+              </Card>
+            ))}
+        </div>
+      ) : campaigns?.data?.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {campaigns?.data?.map((campaign: any, index: number) => (
             <Card key={index} className="overflow-hidden">
               <CardHeader className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-sm">
-                    {campaign?.category}
+                    {!campaign?.category || "Help"}
                   </div>
                   <div className="text-sm capitalize text-muted-foreground">
                     {campaign?.paymentMethod}
@@ -147,9 +200,9 @@ useEffect(() => {
           <Button
             variant="outline"
             onClick={() => {
-              setSearchTerm('');
-              setCategoryFilter('');
-              setPaymentFilter('');
+              setSearchTerm("");
+              setCategoryFilter("");
+              setPaymentFilter("");
             }}
           >
             Clear Filters
@@ -159,4 +212,3 @@ useEffect(() => {
     </div>
   );
 }
-
