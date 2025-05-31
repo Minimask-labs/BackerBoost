@@ -1,10 +1,21 @@
-import { useState, useEffect } from "react";
-import type { NextPage } from "next";
-import { useWallet, CardanoWallet } from "@meshsdk/react";
-import { BlockfrostProvider } from "@meshsdk/core";
-import { walletAuth } from "@/service/auth";
-import { useRouter } from "next/navigation";
-import { useStore } from "@/store/user";
+import { useState, useEffect } from 'react';
+import type { NextPage } from 'next';
+import { useWallet, CardanoWallet } from '@meshsdk/react';
+import { BlockfrostProvider } from '@meshsdk/core';
+import { walletAuth } from '@/service/auth';
+import { useRouter } from 'next/navigation';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Shield, Briefcase, User, Loader2 } from 'lucide-react';
+import { useStore } from '@/store/user';
 
 const key = process.env.NEXT_PUBLIC_CARDANO_PROJECT_ID;
 const provider = new BlockfrostProvider(key as string);
@@ -62,52 +73,18 @@ const Home: NextPage = () => {
   // Auto-authenticate when wallet connects
   useEffect(() => {
     if (connected && wallet && !isAuthenticated && !isAuthenticating) {
-      const authenticate = async () => {
-        setIsAuthenticating(true);
-        setAuthError(null);
-        setCurrentStep("signing");
-        try {
-          if (!address) {
-            throw new Error("No wallet address found");
-          }
-          const nonce = generateNonce();
-          const message = `BackerBoost Authentication\nNonce: ${nonce}\nAddress: ${address}`;
-          const signature = await wallet.signData(address);
-          setCurrentStep("authenticating");
-          const authData = {
-            walletAddress: address,
-            signature: signature.signature,
-            nonce,
-          };
-          const response = await walletAuth(authData);
-          if (response?.data) {
-            setUserToken(response.data.token);
-            setUserData(response.data.user);
-            setIsAuthenticated(true);
-            localStorage.setItem("cardano_auth_token", response.data.token);
-            localStorage.setItem(
-              "cardano_user_data",
-              JSON.stringify(response.data.user)
-            );
-            if (response.data.isNewUser) {
-              console.log("New user, redirect to onboarding");
-              // router.push('/onboarding');
-            } else {
-              console.log("Returning user, redirect to dashboard");
-              router.push("/dashboard");
-            }
-          }
-        } catch (error: any) {
-          console.error("Authentication error:", error);
-          setAuthError(error.message || "Authentication failed");
-        } finally {
-          setIsAuthenticating(false);
-          setCurrentStep("idle");
-        }
-      };
-      authenticate();
+      console.log('Wallet connected, initiating automatic authentication');
+      handleAuthentication();
     }
-  }, [connected, wallet, isAuthenticated, isAuthenticating, address, router]);
+  }, [connected, wallet, isAuthenticated, isAuthenticating]);
+
+  // Log out when wallet disconnects
+  useEffect(() => {
+    if (!connected && isAuthenticated) {
+      console.log('Wallet disconnected, logging out...');
+      handleLogout();
+    }
+  }, [connected, isAuthenticated]);
 
   async function getAssets() {
     if (wallet) {
@@ -115,22 +92,96 @@ const Home: NextPage = () => {
       try {
         const _assets = await wallet.getAssets();
         const balance = await wallet.getBalance();
-        console.log("Balance:", balance);
-        console.log("_assets:", _assets);
+        console.log('Balance:', balance);
+        console.log('_assets:', _assets);
         setAssets(_assets);
       } catch (error) {
-        console.error("Error fetching assets:", error);
+        console.error('Error fetching assets:', error);
       } finally {
         setLoading(false);
       }
     }
   }
 
-  const handleLogout = () => {
-    // setIsAuthenticated(false);
-    disconnect();
-        logout();
+  const handleAuthentication = async () => {
+    if (!wallet || !connected) return;
 
+    setIsAuthenticating(true);
+    setAuthError(null);
+    setCurrentStep('signing');
+
+    try {
+      console.log('wallet', address);
+      // Get wallet address
+      // const usedAddresses = await wallet.getUsedAddresses();
+      // const walletAddress = usedAddresses[0];
+
+      if (!address) {
+        throw new Error('No wallet address found');
+      }
+
+      // Generate nonce for signature
+      const nonce = generateNonce();
+      console.log('nonce', nonce);
+      const message = `BackerBoost Authentication\nNonce: ${nonce}\nAddress: ${address}`;
+
+      // Request signature from wallet
+      const signature = await wallet.signData(address);
+
+      setCurrentStep('authenticating');
+
+      // Prepare authentication data
+      const authData = {
+        walletAddress: address,
+        signature: signature.signature,
+        nonce
+      };
+
+      // Send to backend for verification
+      const response = await walletAuth(authData);
+
+      if (response?.data) {
+        // Save authentication data
+        saveUserToken(response.data.token);
+        saveUserData(response.data.user);
+        setUserToken(response.data.token);
+        setUserData(response.data.user);
+        setIsAuthenticated(true);
+
+        // Persist to localStorage
+        localStorage.setItem('cardano_auth_token', response.data.token);
+        localStorage.setItem(
+          'cardano_user_data',
+          JSON.stringify(response.data.user)
+        );
+
+        console.log('Authentication successful:', response);
+
+        // Handle new user vs returning user logic here
+        if (response.data.isNewUser) {
+          console.log('New user, redirect to onboarding');
+          // router.push('/onboarding');
+        } else {
+          console.log('Returning user, redirect to dashboard');
+          router.push('/dashboard');
+        }
+      }
+    } catch (error: any) {
+      console.error('Authentication error:', error);
+      setAuthError(error.message || 'Authentication failed');
+    } finally {
+      setIsAuthenticating(false);
+      setCurrentStep('idle');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUserToken(null);
+    setUserData(null);
+    setAuthError(null);
+    disconnect();
+    logout();
   };
 
   const getAuthButtonText = () => {
@@ -145,128 +196,117 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className="p-5 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">
-        BackerBoost - Cardano Wallet Authentication
-      </h1>
-
-      {/* Wallet Connection Section */}
-      <div className="mb-8 p-5 border rounded-lg bg-muted">
-        <h2 className="text-xl font-semibold mb-2">Wallet Connection</h2>
-        <CardanoWallet
-          label={"Connect a Wallet"}
-          persist={true}
-          onConnected={() => {
-            console.log("Wallet connected");
-          }}
-          cardanoPeerConnect={{
-            dAppInfo: {
-              name: "BackerBoost",
-              url: "https://backerboost.com/",
-            },
-            announce: [
-              "wss://dev.btt.cf-identity-wallet.metadata.dev.cf-deployments.org",
-            ],
-          }}
-          burnerWallet={{
-            networkId: 0,
-            provider: provider,
-          }}
-        />
-
-        <div className="mt-2 space-y-1">
-          <p>
-            <b>State:</b> {state}
-          </p>
-          <p>
-            <b>Connected:</b> {connected ? "Yes" : "No"}
-          </p>
-          <p>
-            <b>Connecting:</b> {connecting ? "Yes" : "No"}
-          </p>
-          <p>
-            <b>Wallet Name:</b> {name || "None"}
-          </p>
-        </div>
-      </div>
-
-      {/* Authentication Section */}
-      {connected && (
-        <div className="mb-8 p-5 border rounded-lg bg-muted">
-          <h2 className="text-xl font-semibold mb-2">Authentication</h2>
-
-          {!isAuthenticated ? (
-            <div>
-              <p>Connect your wallet to access BackerBoost features</p>
-              {isAuthenticating && (
-                <p className="text-primary mt-2">{getAuthButtonText()}</p>
-              )}
-              {authError && (
-                <p className="text-destructive mt-2">Error: {authError}</p>
-              )}
+    <>
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle
+            className={`text-2xl font-bold ${
+              !connected ? 'animate-pulse' : ''
+            } text-blue-70`}
+          >
+            BackerBoost
+          </CardTitle>
+          <CardDescription>
+            BackerBoost is a decentralised crowdfunding platform that enables
+            individuals to create funding requests for specific goals and share
+            them online.{' '}
+          </CardDescription>
+          
+          {/* Status Indicators */}
+          {connecting && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-blue-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Connecting wallet...</span>
             </div>
-          ) : (
-            <div>
-              <p className="text-green-600">✅ Authenticated successfully!</p>
-              <p>
-                <b>User ID:</b> {userData?.id}
-              </p>
-              <p>
-                <b>Role:</b> {userData?.role}
-              </p>
-              <p>
-                <b>Wallet:</b>{" "}
-                <span className="break-all">
-                  {userData?.walletAddress?.slice(0, 50)}...
-                </span>
-              </p>
+          )}
+          
+          {connected && isAuthenticated && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-green-600">
+              <Shield className="h-4 w-4" />
+              <span className="text-sm">Authenticated Successfully</span>
+            </div>
+          )}
 
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-destructive text-white rounded mt-2 hover:bg-destructive/90"
+          {connected && isAuthenticating && (
+            <div className="flex items-center justify-center gap-2 mt-2 text-blue-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">{getAuthButtonText()}</span>
+            </div>
+          )}
+
+          {authError && (
+            <div className="mt-2 p-2 bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm">
+              Error: {authError}
+            </div>
+          )}
+        </CardHeader>
+
+        <CardContent>
+          {/* Keep the CardContent empty as in original */}
+        </CardContent>
+
+        <CardFooter>
+          <div className="w-full space-y-4">
+            {!connected && (
+              <div className="flex justify-center items-center w-full">
+                <CardanoWallet
+                  label="Connect a Wallet"
+                  persist={true}
+                  onConnected={() => {
+                    console.log('Wallet connected');
+                  }}
+                  cardanoPeerConnect={{
+                    dAppInfo: {
+                      name: 'BackerBoost',
+                      url: 'https://backerboost.com/'
+                    },
+                    announce: [
+                      'wss://dev.btt.cf-identity-wallet.metadata.dev.cf-deployments.org'
+                    ]
+                  }}
+                  burnerWallet={{
+                    networkId: 0,
+                    provider: provider
+                  }}
+                />
+              </div>
+            )}
+
+            {/* {connected  && (
+              <Button
+                onClick={handleAuthentication}
+                disabled={connecting}
+                className="w-full bg-blue-600 hover:bg-blue-700"
               >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+                {connecting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {getAuthButtonText()}
+              </Button>
+            )} */}
 
-      {/* Assets Section - Only show if authenticated */}
-      {connected && isAuthenticated && (
-        <div className="mb-8 p-5 border rounded-lg bg-muted">
-          <h2 className="text-xl font-semibold mb-2">Wallet Assets</h2>
-          {assets ? (
-            <pre className="bg-background p-2 rounded overflow-auto">
-              <code>{JSON.stringify(assets, null, 2)}</code>
-            </pre>
-          ) : (
-            <button
-              type="button"
-              onClick={getAssets}
-              disabled={loading}
-              className={`px-4 py-2 rounded text-white mt-2 ${
-                loading
-                  ? "bg-secondary cursor-not-allowed"
-                  : "bg-primary hover:bg-primary/90"
-              }`}
-            >
-              {loading ? "⏳ Loading..." : "Get Wallet Assets"}
-            </button>
-          )}
-        </div>
-      )}
+            {connected && isAuthenticated && (
+              <Button
+                onClick={handleLogout}
+                className="w-full bg-red-600 hover:bg-red-700"
+              >
+                Disconnect & Logout
+              </Button>
+            )}
 
-      {/* Disconnect Section */}
-      {connected && (
-        <button
-          onClick={disconnect}
-          className="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/90"
-        >
-          Disconnect Wallet
-        </button>
-      )}
-    </div>
+            {connected && !isAuthenticated && !isAuthenticating && (
+              <Button
+                onClick={disconnect}
+                variant="outline"
+                className="w-full"
+              >
+                Disconnect Wallet
+              </Button>
+            )}
+          </div>
+        </CardFooter>
+      </Card>
+    </>
   );
 };
 
