@@ -52,7 +52,8 @@ export default function CreateCampaignPage() {
     description: "",
     category: "",
     targetAmount: "",
-    deadline: "",
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: "",
     paymentType: "both",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -72,6 +73,8 @@ export default function CreateCampaignPage() {
     e.preventDefault();
     setErrors({});
     const result = CampaignSchema.safeParse(formData);
+ 
+
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
@@ -205,12 +208,12 @@ export default function CreateCampaignPage() {
                   name="deadline"
                   type="date"
                   min={minDate}
-                  value={formData.deadline}
+                  value={formData.endDate}
                   onChange={handleChange}
                   required
                 />
-                {errors.deadline && (
-                  <p className="text-sm text-red-500">{errors.deadline}</p>
+                {errors.endDate && (
+                  <p className="text-sm text-red-500">{errors.endDate}</p>
                 )}
               </div>
               <div className="space-y-2">
@@ -228,18 +231,18 @@ export default function CreateCampaignPage() {
                       Crypto
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  {/* <div className="flex items-center space-x-2">
                     <RadioGroupItem value="fiat" id="fiat" />
                     <Label htmlFor="fiat" className="cursor-pointer">
                       Fiat
                     </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
+                  </div> */}
+                  {/* <div className="flex items-center space-x-2">
                     <RadioGroupItem value="both" id="both" />
                     <Label htmlFor="both" className="cursor-pointer">
                       Both
                     </Label>
-                  </div>
+                  </div> */}
                 </RadioGroup>
                 {errors.paymentType && (
                   <p className="text-sm text-red-500">{errors.paymentType}</p>
