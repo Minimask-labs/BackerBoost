@@ -4,9 +4,6 @@ export interface LayoutProps {
   children: React.ReactNode;
 }
 
-
-
-
 export interface Campaign {
   _id?: string;
   category: string;
